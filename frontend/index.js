@@ -13,30 +13,69 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   const learnersRes = await axios.get('http://localhost:3003/api/learners');
   const mentorsRes = await axios.get('http://localhost:3003/api/mentors');
 
-    console.log(learnersRes.data[0].id)
-    //console.log(mentorsRes.data)
+    //console.log(learnersRes.data[0].id)
+    //console.log(mentorsRes.data[0])
 
     document.querySelector('.info').textContent = 'No learner is selected'
     const section = document.querySelector('section')
-    const cards = document.querySelectorAll('.cards')    
+    const cards = document.querySelectorAll('.cards')  
+    const card = document.querySelectorAll('.card')  
 
     // BUILD FUNCTION TO LINK DATA TO LEARNER CARD
     
+    // eslint-disable-next-line no-inner-declarations
     function learnerCard(learner) {
       const card = document.createElement('div')
       card.classList.add('card')
       const fullName = document.createElement('h3')
-      fullName.textContent = learner.fullName
+        fullName.textContent = learner.fullName
       const email = document.createElement('div')
-      email.textContent = learner.email
+        email.textContent = learner.email
       const mentors = document.createElement('h4')
-      mentors.textContent = 'Mentors'
-     // const mentDropdown = document.createElement('ul')
-     // const ment1 = document.createElement('li')
-     // const ment2 = document.createElement('li')
+        mentors.textContent = 'Mentors'
+      const mentDropdown = document.createElement('ul')
+        for (let i = 0; i < learner.mentors.length; i++) {
+          for (let j = 0;  j < mentorsRes.data.length; j++) {
+            if (learner.mentors[i] === mentorsRes.data[j].id) {
+          const mentorList = document.createElement('li')
+            mentorList.textContent = `${mentorsRes.data[j].firstName} ${mentorsRes.data[j].lastName}`
+            mentDropdown.appendChild(mentorList)
+            }
+          }
+        }
+    
       card.appendChild(fullName);
       card.appendChild(email);
       card.appendChild(mentors)
+      card.appendChild(mentDropdown)
+
+     
+      card.classList.remove('selected')
+      card.addEventListener('click', () => {
+        if (!card.classList.contains('selected')) {
+          card.classList.toggle('selected')
+          fullName.textContent = `${learner.fullName}, ${learner.id}`
+          document.querySelector('.info').textContent = `The selected learner is ${learner.fullName}`
+        }
+        else if (card.classList.contains('selected')) {
+          card.classList.toggle('selected')
+          fullName.textContent = learner.fullName
+          document.querySelector('.info').textContent = 'No learner is selected'
+        }
+      })
+      
+      mentors.classList.add('closed')
+      mentors.addEventListener('click', evt => {
+        if (mentors.classList.contains('closed')) {
+          mentors.classList.remove('closed')
+          mentors.classList.add('open')
+        }
+        else {
+          mentors.classList.remove('open')
+          mentors.classList.add('closed')
+        }
+      })
+      
       return card;
     } 
 
@@ -47,23 +86,18 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
         id: `ID ${learnersRes.data[i].id}`,
         email: `${learnersRes.data[i].email}`,
         fullName: `${learnersRes.data[i].fullName}`,
-        //mentors: ['']
-      }
+        mentors: learnersRes.data[i].mentors
+      }     
 
-      learnerCard(learner)
-      cards.forEach(card => {
-      const newLearner = learnerCard(learner);
+    const newLearner = learnerCard(learner);
+    cards.forEach(card => {
       card.appendChild(newLearner)
-    })
+      })
     }
-
-    // BUILD INTERACTIVITY
-    
-    
   }
   
   catch (err) {
-  console.log('Error: ', err.message)
+    console.log('Error: ', err.message)
   }
 
 
