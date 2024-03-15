@@ -50,15 +50,19 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
       card.appendChild(mentDropdown)
 
      
-      card.classList.remove('selected')
+      //card.classList.remove('selected')
       card.addEventListener('click', () => {
+        cards.forEach(card => {
+          card.classList.remove('selected')
+        })
+        
         if (!card.classList.contains('selected')) {
-          card.classList.toggle('selected')
+          card.classList.add('selected')
           fullName.textContent = `${learner.fullName}, ${learner.id}`
           document.querySelector('.info').textContent = `The selected learner is ${learner.fullName}`
         }
         else if (card.classList.contains('selected')) {
-          card.classList.toggle('selected')
+          card.classList.remove('selected')
           fullName.textContent = learner.fullName
           document.querySelector('.info').textContent = 'No learner is selected'
         }
