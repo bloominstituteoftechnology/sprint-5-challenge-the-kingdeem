@@ -7,24 +7,24 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
   const currentYear = new Date().getFullYear()
   footer.textContent = `© BLOOM INSTITUTE OF TECHNOLOGY ${currentYear - 1}`
   
-  try {
+  
   // FETCH LEARNER & MENTOR INFO
   
   const learnersRes = await axios.get('http://localhost:3003/api/learners');
   const mentorsRes = await axios.get('http://localhost:3003/api/mentors');
-
+  //console.log(learnersRes)
     //console.log(learnersRes.data[0].id)
     //console.log(mentorsRes.data[0])
 
-    document.querySelector('.info').textContent = 'No learner is selected'
-    const section = document.querySelector('section')
-    const cards = document.querySelectorAll('.cards')  
-    const card = document.querySelectorAll('.card')  
-
+    const info = document.querySelector('.info')
+    info.textContent = 'No learner is selected'
+    
+    const cards = document.querySelector('.cards')  
     // BUILD FUNCTION TO LINK DATA TO LEARNER CARD
     
     // eslint-disable-next-line no-inner-declarations
     function learnerCard(learner) {
+
       const card = document.createElement('div')
       card.classList.add('card')
       const fullName = document.createElement('h3')
@@ -49,24 +49,29 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
       card.appendChild(mentors)
       card.appendChild(mentDropdown)
 
-     
-      //card.classList.remove('selected')
-      card.addEventListener('click', () => {
-        cards.forEach(card => {
-          card.classList.remove('selected')
-        })
+      cards.appendChild(card)
+  
+      fullName.style.pointerEvents = 'none'
+      email.style.pointerEvents = 'none'
+      
+
+      card.addEventListener('click', (evt) => {
+        evt.stopPropagation()
+        console.log(card)
+        card.classList.toggle('selected')
         
-        if (!card.classList.contains('selected')) {
-          card.classList.add('selected')
-          fullName.textContent = `${learner.fullName}, ${learner.id}`
-          document.querySelector('.info').textContent = `The selected learner is ${learner.fullName}`
+        if (card.classList.contains('selected')) {
+        fullName.textContent = `${learner.fullName}, ${learner.id}`
+        info.textContent = `The selected learner is ${learner.fullName}`
         }
-        else if (card.classList.contains('selected')) {
-          card.classList.remove('selected')
+        else {
           fullName.textContent = learner.fullName
-          document.querySelector('.info').textContent = 'No learner is selected'
+          info.textContent = 'No learner is selected'
         }
-      })
+       
+    });
+    
+
       
       mentors.classList.add('closed')
       mentors.addEventListener('click', evt => {
@@ -82,7 +87,7 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
       
       return card;
     } 
-
+    
  // CREATE LEARNER CARD INFO
  
     for (let i = 0; i < learnersRes.data.length; i++) {
@@ -93,20 +98,15 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
         mentors: learnersRes.data[i].mentors
       }     
 
-    const newLearner = learnerCard(learner);
-    cards.forEach(card => {
-      card.appendChild(newLearner)
-      })
+    learnerCard(learner);
     }
   }
   
-  catch (err) {
-    console.log('Error: ', err.message)
-  }
+
 
 
   // 👆 WORK WORK ABOVE THIS LINE 👆
-}
+
 
 // ❗ DO NOT CHANGE THE CODE  BELOW
 if (typeof module !== 'undefined' && module.exports) module.exports = { sprintChallenge5 }
