@@ -23,7 +23,7 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
     // BUILD FUNCTION TO LINK DATA TO LEARNER CARD
     
     // eslint-disable-next-line no-inner-declarations
-    function learnerCard(learner) {
+    function learnerCard(learner, i) {
 
       const card = document.createElement('div')
       card.classList.add('card')
@@ -54,23 +54,38 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
       fullName.style.pointerEvents = 'none'
       email.style.pointerEvents = 'none'
       
+      card.setAttribute('data-learner-i', i)
 
       card.addEventListener('click', (evt) => {
-        evt.stopPropagation()
-        console.log(card)
-        card.classList.toggle('selected')
+        //evt.stopPropagation()
+        //console.log(card)
+        const cardList = document.querySelectorAll('.card')
+        cardList.forEach(card => {
+          if (card === evt.currentTarget) {
+            card.classList.toggle('selected')
+            fullName.textContent = `${learner.fullName}, ${learner.id}`
+            info.textContent = `The selected learner is ${learner.fullName}`
+          }
+          else {
+            card.classList.remove('selected')
+            const deselectedLearnerIndex =
+            card.getAttribute('data-learner-i');
+            const deselectedLearnerNameElement = document.querySelector('h3')
+            if (deselectedLearnerIndex !== null) {
+            const deselectedLearner = learner[deselectedLearnerIndex];
+            if (deselectedLearner) {
+              deselectedLearnerNameElement.textContent =
+              deselectedLearner.fullName
+            }
+          }
+          }
+        })
         
-        if (card.classList.contains('selected')) {
-        fullName.textContent = `${learner.fullName}, ${learner.id}`
-        info.textContent = `The selected learner is ${learner.fullName}`
-        }
-        else {
+        if (!card.classList.contains('selected')) {
           fullName.textContent = learner.fullName
           info.textContent = 'No learner is selected'
         }
-       
-    });
-    
+      });
 
       
       mentors.classList.add('closed')
@@ -98,7 +113,7 @@ async function sprintChallenge5() { // Note the async keyword, in case you wish 
         mentors: learnersRes.data[i].mentors
       }     
 
-    learnerCard(learner);
+    learnerCard(learner, i);
     }
   }
   
